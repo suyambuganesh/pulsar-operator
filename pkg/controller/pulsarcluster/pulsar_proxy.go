@@ -4,7 +4,7 @@ import (
 	"context"
 
 	pulsarv1alpha1 "github.com/sky-big/pulsar-operator/pkg/apis/pulsar/v1alpha1"
-	"github.com/sky-big/pulsar-operator/pkg/components/proxy"
+	"github.com/sky-big/pulsar-operator/pkg/pulsar/components/proxy"
 
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
@@ -108,4 +108,15 @@ func (r *ReconcilePulsarCluster) reconcileProxyService(c *pulsarv1alpha1.PulsarC
 		}
 	}
 	return
+}
+
+func (r *ReconcilePulsarCluster) isProxyRunning(c *pulsarv1alpha1.PulsarCluster) bool {
+	dm := proxy.MakeDeployment(c)
+
+	dmCur := &appsv1.Deployment{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      dm.Name,
+		Namespace: dm.Namespace,
+	}, dmCur)
+	return err == nil && dmCur.Status.ReadyReplicas == c.Spec.Proxy.Size
 }

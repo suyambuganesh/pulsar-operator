@@ -4,8 +4,8 @@ import (
 	"context"
 
 	pulsarv1alpha1 "github.com/sky-big/pulsar-operator/pkg/apis/pulsar/v1alpha1"
-	"github.com/sky-big/pulsar-operator/pkg/components/bookie"
-	"github.com/sky-big/pulsar-operator/pkg/components/bookie/autorecovery"
+	"github.com/sky-big/pulsar-operator/pkg/pulsar/components/bookie"
+	"github.com/sky-big/pulsar-operator/pkg/pulsar/components/bookie/autorecovery"
 
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
@@ -143,4 +143,16 @@ func (r *ReconcilePulsarCluster) reconcileBookieAutoRecoveryDeployment(c *pulsar
 		"ReadyNum", dmCur.Status.ReadyReplicas,
 	)
 	return
+}
+
+func (r *ReconcilePulsarCluster) isBookieRunning(c *pulsarv1alpha1.PulsarCluster) bool {
+	ss := &appsv1.StatefulSet{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      bookie.MakeStatefulSetName(c),
+		Namespace: c.Namespace,
+	}, ss)
+	if err == nil {
+		return ss.Status.ReadyReplicas == c.Spec.Bookie.Size
+	}
+	return false
 }

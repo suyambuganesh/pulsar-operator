@@ -4,7 +4,7 @@ import (
 	"context"
 
 	pulsarv1alpha1 "github.com/sky-big/pulsar-operator/pkg/apis/pulsar/v1alpha1"
-	"github.com/sky-big/pulsar-operator/pkg/components/broker"
+	"github.com/sky-big/pulsar-operator/pkg/pulsar/components/broker"
 
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
@@ -108,4 +108,15 @@ func (r *ReconcilePulsarCluster) reconcileBrokerService(c *pulsarv1alpha1.Pulsar
 		}
 	}
 	return
+}
+
+func (r *ReconcilePulsarCluster) isBrokerRunning(c *pulsarv1alpha1.PulsarCluster) bool {
+	dm := broker.MakeDeployment(c)
+
+	dmCur := &appsv1.Deployment{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      dm.Name,
+		Namespace: dm.Namespace,
+	}, dmCur)
+	return err == nil && dmCur.Status.ReadyReplicas == c.Spec.Broker.Size
 }

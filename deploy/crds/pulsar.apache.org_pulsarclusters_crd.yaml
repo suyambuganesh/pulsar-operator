@@ -46,12 +46,20 @@ spec:
                     tag:
                       type: string
                   type: object
+                journalStorageCapacity:
+                  description: Storage request capacity(Gi unit) for journal
+                  format: int32
+                  type: integer
                 labels:
                   additionalProperties:
                     type: string
                   description: Labels specifies the labels to attach to pods the operator
                     creates for the bookie cluster.
                   type: object
+                ledgersStorageCapacity:
+                  description: Storage request capacity(Gi unit) for ledgers
+                  format: int32
+                  type: integer
                 pod:
                   description: "Pod defines the policy to create pod for the bookie
                     cluster. \n Updating the pod does not take effect on any existing
@@ -689,6 +697,27 @@ spec:
                       description: Annotations specifies the annotations to attach
                         to pods the operator creates.
                       type: object
+                    components:
+                      description: Resources is the resource requirements for the
+                        container. This field cannot be updated once the cluster is
+                        created.
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
                     env:
                       description: List of environment variables to set in the container.
                         This field cannot be updated.
@@ -809,27 +838,6 @@ spec:
                       description: NodeSelector specifies a map of key-value pairs.
                         For the pod to be eligible to run on a node, the node must
                         have each of the indicated key-value pairs as labels.
-                      type: object
-                    resources:
-                      description: Resources is the resource requirements for the
-                        container. This field cannot be updated once the cluster is
-                        created.
-                      properties:
-                        limits:
-                          additionalProperties:
-                            type: string
-                          description: 'Limits describes the maximum amount of compute
-                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
-                          type: object
-                        requests:
-                          additionalProperties:
-                            type: string
-                          description: 'Requests describes the minimum amount of compute
-                            resources required. If Requests is omitted for a container,
-                            it defaults to Limits if that is explicitly specified,
-                            otherwise to an implementation-defined value. More info:
-                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
-                          type: object
                       type: object
                     securityContext:
                       description: 'SecurityContext specifies the security context
@@ -982,9 +990,6 @@ spec:
                   type: integer
                 storageClassName:
                   description: "Storage class name \n PVC of storage class name"
-                  type: string
-                storageVolume:
-                  description: "Storage volume \n Bookie component storage data volume(EmptyDir/Local)."
                   type: string
               type: object
             broker:
@@ -1645,6 +1650,27 @@ spec:
                       description: Annotations specifies the annotations to attach
                         to pods the operator creates.
                       type: object
+                    components:
+                      description: Resources is the resource requirements for the
+                        container. This field cannot be updated once the cluster is
+                        created.
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
                     env:
                       description: List of environment variables to set in the container.
                         This field cannot be updated.
@@ -1765,27 +1791,6 @@ spec:
                       description: NodeSelector specifies a map of key-value pairs.
                         For the pod to be eligible to run on a node, the node must
                         have each of the indicated key-value pairs as labels.
-                      type: object
-                    resources:
-                      description: Resources is the resource requirements for the
-                        container. This field cannot be updated once the cluster is
-                        created.
-                      properties:
-                        limits:
-                          additionalProperties:
-                            type: string
-                          description: 'Limits describes the maximum amount of compute
-                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
-                          type: object
-                        requests:
-                          additionalProperties:
-                            type: string
-                          description: 'Requests describes the minimum amount of compute
-                            resources required. If Requests is omitted for a container,
-                            it defaults to Limits if that is explicitly specified,
-                            otherwise to an implementation-defined value. More info:
-                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
-                          type: object
                       type: object
                     securityContext:
                       description: 'SecurityContext specifies the security context
@@ -1937,27 +1942,95 @@ spec:
                   format: int32
                   type: integer
               type: object
+            manager:
+              description: Manager defines the desired state of Manager
+              properties:
+                annotations:
+                  additionalProperties:
+                    type: string
+                  description: Ingress additional annotation
+                  type: object
+                enable:
+                  description: Is enable pulsar cluster manager flag.
+                  type: boolean
+                host:
+                  description: Host (DEPRECATED) is the expected host of the pulsar
+                    manager.
+                  type: string
+                image:
+                  description: Image is the  container image. default is apachepulsar/pulsar-all:latest
+                  properties:
+                    pullPolicy:
+                      description: PullPolicy describes a policy for if/when to pull
+                        a container image
+                      type: string
+                    repository:
+                      type: string
+                    tag:
+                      type: string
+                  type: object
+                labels:
+                  additionalProperties:
+                    type: string
+                  description: Labels specifies the labels to attach to pods the operator
+                    creates for the broker cluster.
+                  type: object
+                nodePort:
+                  description: NodePort (DEPRECATED) is the expected port of the pulsar
+                    manager.
+                  format: int32
+                  type: integer
+                userName:
+                  description: User Name
+                  type: string
+                userPassword:
+                  description: User Password
+                  type: string
+              type: object
             monitor:
               description: Monitor defines the desired state of Monitor
               properties:
-                dashboardPort:
-                  description: DashboardPort (DEPRECATED) is the expected port of
-                    the pulsar dashboard.
-                  format: int32
-                  type: integer
-                grafanaPort:
-                  description: GrafanaPort (DEPRECATED) is the expected port of the
-                    pulsar grafana.
-                  format: int32
-                  type: integer
-                isActive:
-                  description: Is active pulsar cluster monitor flag.
+                enable:
+                  description: Is enable pulsar cluster monitor flag.
                   type: boolean
-                prometheusPort:
-                  description: PrometheusPort (DEPRECATED) is the expected port of
-                    the pulsar prometheus.
-                  format: int32
-                  type: integer
+                grafana:
+                  description: Grafana
+                  properties:
+                    host:
+                      description: Host (DEPRECATED) is the expected host of the pulsar
+                        grafana.
+                      type: string
+                    nodePort:
+                      description: NodePort (DEPRECATED) is the expected port of the
+                        pulsar grafana.
+                      format: int32
+                      type: integer
+                  type: object
+                ingress:
+                  description: Ingress
+                  properties:
+                    annotations:
+                      additionalProperties:
+                        type: string
+                      description: Ingress additional annotation
+                      type: object
+                    enable:
+                      description: enable ingress
+                      type: boolean
+                  type: object
+                prometheus:
+                  description: Prometheus
+                  properties:
+                    host:
+                      description: Host (DEPRECATED) is the expected host of the pulsar
+                        prometheus.
+                      type: string
+                    nodePort:
+                      description: NodePort (DEPRECATED) is the expected port of the
+                        pulsar prometheus.
+                      format: int32
+                      type: integer
+                  type: object
               type: object
             proxy:
               description: Proxy defines the desired state of Proxy
@@ -2617,6 +2690,27 @@ spec:
                       description: Annotations specifies the annotations to attach
                         to pods the operator creates.
                       type: object
+                    components:
+                      description: Resources is the resource requirements for the
+                        container. This field cannot be updated once the cluster is
+                        created.
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
                     env:
                       description: List of environment variables to set in the container.
                         This field cannot be updated.
@@ -2737,27 +2831,6 @@ spec:
                       description: NodeSelector specifies a map of key-value pairs.
                         For the pod to be eligible to run on a node, the node must
                         have each of the indicated key-value pairs as labels.
-                      type: object
-                    resources:
-                      description: Resources is the resource requirements for the
-                        container. This field cannot be updated once the cluster is
-                        created.
-                      properties:
-                        limits:
-                          additionalProperties:
-                            type: string
-                          description: 'Limits describes the maximum amount of compute
-                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
-                          type: object
-                        requests:
-                          additionalProperties:
-                            type: string
-                          description: 'Requests describes the minimum amount of compute
-                            resources required. If Requests is omitted for a container,
-                            it defaults to Limits if that is explicitly specified,
-                            otherwise to an implementation-defined value. More info:
-                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
-                          type: object
                       type: object
                     securityContext:
                       description: 'SecurityContext specifies the security context
@@ -3567,6 +3640,27 @@ spec:
                       description: Annotations specifies the annotations to attach
                         to pods the operator creates.
                       type: object
+                    components:
+                      description: Resources is the resource requirements for the
+                        container. This field cannot be updated once the cluster is
+                        created.
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
                     env:
                       description: List of environment variables to set in the container.
                         This field cannot be updated.
@@ -3687,27 +3781,6 @@ spec:
                       description: NodeSelector specifies a map of key-value pairs.
                         For the pod to be eligible to run on a node, the node must
                         have each of the indicated key-value pairs as labels.
-                      type: object
-                    resources:
-                      description: Resources is the resource requirements for the
-                        container. This field cannot be updated once the cluster is
-                        created.
-                      properties:
-                        limits:
-                          additionalProperties:
-                            type: string
-                          description: 'Limits describes the maximum amount of compute
-                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
-                          type: object
-                        requests:
-                          additionalProperties:
-                            type: string
-                          description: 'Requests describes the minimum amount of compute
-                            resources required. If Requests is omitted for a container,
-                            it defaults to Limits if that is explicitly specified,
-                            otherwise to an implementation-defined value. More info:
-                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
-                          type: object
                       type: object
                     securityContext:
                       description: 'SecurityContext specifies the security context

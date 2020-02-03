@@ -33,6 +33,9 @@ const (
 
 	// Monitor component
 	MonitorComponent = "monitor"
+
+	// Manager component
+	ManagerComponent = "manager"
 )
 
 // bookie child component
@@ -43,9 +46,6 @@ const (
 
 // monitor child component
 const (
-	// Monitor dashbaord component
-	MonitorDashboardComponent = "monitor-dashboard"
-
 	// Monitor prometheus component
 	MonitorPrometheusComponent = "monitor-prometheus"
 
@@ -54,7 +54,7 @@ const (
 )
 
 const (
-	// DefaultPulsarContainerRepository is the pulsar common container
+	// DefaultPulsarManagerRepository is default docker image name of pulsar pulsar
 	DefaultPulsarContainerRepository = "apachepulsar/pulsar"
 
 	// DefaultPulsarContainerVersion is the default tag used for container
@@ -65,6 +65,12 @@ const (
 
 	// DefaultAllPulsarContainerVersion is the default tag used for components
 	DefaultAllPulsarContainerVersion = "latest"
+
+	// DefaultPulsarManagerRepository is default docker image name of pulsar manager
+	DefaultPulsarManagerContainerRepository = "apachepulsar/pulsar-manager"
+
+	// DefaultPulsarManagerContainerVersion is
+	DefaultPulsarManagerContainerVersion = "v0.1.0"
 
 	// DefaultZkContainerPolicy is the default container pull policy used
 	DefaultContainerPolicy = "Always"
@@ -85,7 +91,7 @@ const (
 	LabelChildComponent = "child-component"
 )
 
-func MakeLabels(c *PulsarCluster, component string) map[string]string {
+func MakeComponentLabels(c *PulsarCluster, component string) map[string]string {
 	return MakeAllLabels(c, component, "")
 }
 
@@ -117,9 +123,6 @@ const (
 	// Bookie number default num is 3
 	BookieClusterDefaultNodeNum = 3
 
-	// Bookie Autorecovery default num is 3
-	BookieAutoRecoveryClusterDefaultNodeNum = 3
-
 	// Proxy number default num is 3
 	ProxyClusterDefaultNodeNum = 3
 )
@@ -135,21 +138,39 @@ const (
 	// Container leader election port
 	ZookeeperContainerLeaderElectionPort = 3888
 
-	// Broker service port
-	PulsarBrokerPulsarServicePort = 6650
+	// Broker server port
+	PulsarBrokerPulsarServerPort = 6650
 
-	// Broker http service port
-	PulsarBrokerHttpServicePort = 8080
+	// Broker http server port
+	PulsarBrokerHttpServerPort = 8080
 
-	// Bookie service port
-	BookieServerPort = 3181
+	// Bookie server port
+	PulsarBookieServerPort = 3181
+
+	// Grafana server port
+	PulsarGrafanaServerPort = 3000
+
+	// Prometheus server port
+	PulsarPrometheusServerPort = 9090
+
+	// Manager server port
+	PulsarManagerServerPort = 9527
 )
 
-// Support storage volume
+// Storage default capacity
 const (
-	// EmptyDir volume
-	EmptyDirVolume = "EmptyDir"
+	// journal storage default capacity
+	JournalStorageDefaultCapacity = 1
 
-	// Local persistent volume
-	LocalVolume = "Local"
+	// ledgers storage default capacity
+	LedgersStorageDefaultCapacity = 10
+)
+
+// Manager component default user name and user password
+const (
+	// manager user default name
+	ManagerDefaultUserName = "pulsar"
+
+	// manager user default password
+	ManagerDefaultUserPassword = "pulsar"
 )

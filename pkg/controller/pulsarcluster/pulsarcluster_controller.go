@@ -4,7 +4,7 @@ import (
 	"context"
 
 	pulsarv1alpha1 "github.com/sky-big/pulsar-operator/pkg/apis/pulsar/v1alpha1"
-	"github.com/sky-big/pulsar-operator/pkg/metadata"
+	"github.com/sky-big/pulsar-operator/pkg/pulsar/metadata"
 
 	"github.com/go-logr/logr"
 
@@ -124,7 +124,7 @@ type ReconcilePulsarCluster struct {
 // and what is in the PulsarCluster.Spec
 // Note:
 // The Controller will requeue the Request to be processed again if the returned error is non-nil or
-// Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
+// Result.Requeue is true, otherwise upon completion it will remove the work from the queue-proxy.
 func (r *ReconcilePulsarCluster) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	r.log = log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
 	r.log.Info("[Start] Reconciling PulsarCluster")
@@ -174,6 +174,7 @@ func (r *ReconcilePulsarCluster) Reconcile(request reconcile.Request) (reconcile
 		r.reconcileProxy,
 		r.reconcilePulsarCluster,
 		r.reconcileMonitor,
+		r.reconcileManager,
 	} {
 		if err = fun(instance); err != nil {
 			return reconcile.Result{}, err
@@ -186,6 +187,10 @@ func (r *ReconcilePulsarCluster) Reconcile(request reconcile.Request) (reconcile
 // Reconcile pulsarCluster resource
 func (r *ReconcilePulsarCluster) reconcilePulsarCluster(c *pulsarv1alpha1.PulsarCluster) error {
 	if err := r.reconcileInitPulsarClusterMetaData(c); err != nil {
+		return err
+	}
+
+	if err := r.reconcilePulsarClusterPhase(c); err != nil {
 		return err
 	}
 	return nil
@@ -220,6 +225,22 @@ func (r *ReconcilePulsarCluster) reconcileInitPulsarClusterMetaData(c *pulsarv1a
 					"PulsarCluster.Namespace", c.Namespace,
 					"PulsarCluster.Name", c.Name)
 			}
+		}
+	}
+	return
+}
+
+func (r *ReconcilePulsarCluster) reconcilePulsarClusterPhase(c *pulsarv1alpha1.PulsarCluster) (err error) {
+	if c.Status.Phase == pulsarv1alpha1.PulsarClusterLaunchingPhase &&
+		r.isZookeeperRunning(c) &&
+		r.isBookieRunning(c) &&
+		r.isBrokerRunning(c) &&
+		r.isProxyRunning(c) {
+		c.Status.Phase = pulsarv1alpha1.PulsarClusterRunningPhase
+		if err = r.client.Status().Update(context.TODO(), c); err == nil {
+			r.log.Info("start pulsar cluster success",
+				"PulsarCluster.Namespace", c.Namespace,
+				"PulsarCluster.Name", c.Name)
 		}
 	}
 	return

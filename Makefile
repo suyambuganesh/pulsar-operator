@@ -19,7 +19,7 @@ build:
 # Example:
 #   make image
 image:
-	pushd docker && sh ./build-image.sh && popd
+	docker/build-image.sh
 .PHONY: image
 
 # Push the docker image
@@ -27,7 +27,7 @@ image:
 # Example:
 #   make push
 push:
-	pushd docker && sh ./push-image.sh && popd
+	docker/push-image.sh
 .PHONY: push
 
 # generate code(zz_generated*)
@@ -67,6 +67,48 @@ start-local:
 stop-local:
 	test/local/uninstall.sh
 .PHONY: stop-local
+
+# start pvc test
+# Example:
+#   make start-pvc
+start-pvc:
+	test/pvc/install.sh
+.PHONY: start-pvc
+
+# stop pvc test
+# Example:
+#   make stop-pvc
+stop-pvc:
+	test/pvc/uninstall.sh
+.PHONY: stop-pvc
+
+# start ingress test
+# Example:
+#   make start-ingress
+start-ingress:
+	test/ingress/install.sh
+.PHONY: start-ingress
+
+# stop ingress test
+# Example:
+#   make stop-ingress
+stop-ingress:
+	test/ingress/uninstall.sh
+.PHONY: stop-ingress
+
+# start manager test
+# Example:
+#   make start-manager
+start-manager:
+	test/manager/install.sh
+.PHONY: start-manager
+
+# stop manager test
+# Example:
+#   make stop-manager
+stop-manager:
+	test/manager/uninstall.sh
+.PHONY: stop-manager
 
 # clean all binaries
 #
